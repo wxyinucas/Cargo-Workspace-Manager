@@ -12,3 +12,6 @@ clap = { version = "3", features = ["derive"] }
 toml = "0.5.9"
 serde = "*"
 serde_derive = "*"
+
+[dev-dependencies]
+tempfile = "3"

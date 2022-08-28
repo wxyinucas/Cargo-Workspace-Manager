@@ -1,0 +1,43 @@
+use crate::error::ManagerError;
+
+
+#[derive(Parser, Debug)]
+#[clap(author = "Rex Wang", version, about, long_about = None)]
+pub struct Cli {
+    #[clap(subcommand)]
+    pub action: Action,
+
+    #[clap(short, long)]
+    pub debug: bool,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Action {
+    Add(Add),
+    Fix(Fix),
+    Rename(Rename),
+    Delete(Delete),
+    New,
+}
+
+#[derive(Debug, Parser)]
+pub struct Add {
+    pub(crate) name: String,
+}
+
+#[derive(Debug, Parser)]
+pub struct Fix;
+
+#[derive(Debug, Parser)]
+pub struct Rename {
+    pub(crate) old: String,
+    pub(crate) new: String,
+}
+
+#[derive(Debug, Parser)]
+pub struct Delete {
+    pub(crate) name: String,
+}
+
+#[derive(Debug, Parser)]
+pub struct New;

@@ -1,12 +1,12 @@
-mod cli;
 mod error;
-mod toml_struct;
+mod structures;
 
 use std::env;
 
 use clap::Parser;
-use cli::{Cli, ProcessSub};
+use structures::command::{Cli, ProcessSub};
 use error::ManagerError;
+use crate::structures::command;
 
 pub fn run() -> Result<(), ManagerError> {
     let cli = Cli::parse();
@@ -19,10 +19,10 @@ pub fn run() -> Result<(), ManagerError> {
     cargo_path = cargo_path.join("Cargo.toml");
 
     match cli.action {
-        cli::Action::Add(add) => add.process(&cargo_path),
-        cli::Action::Delete(delete) => delete.process(&cargo_path),
-        cli::Action::Rename(rename) => rename.process(&cargo_path),
-        cli::Action::Fix(fix) => fix.process(&cargo_path),
+        command::Action::Add(add) => add.process(&cargo_path),
+        command::Action::Delete(delete) => delete.process(&cargo_path),
+        command::Action::Rename(rename) => rename.process(&cargo_path),
+        command::Action::Fix(fix) => fix.process(&cargo_path),
     }?;
 
     Ok(())
