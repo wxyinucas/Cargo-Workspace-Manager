@@ -1,4 +1,4 @@
-use crate::error::ManagerError;
+use clap::{Parser, Subcommand};
 
 
 #[derive(Parser, Debug)]
@@ -17,7 +17,7 @@ pub enum Action {
     Fix(Fix),
     Rename(Rename),
     Delete(Delete),
-    New,
+    New(New),
 }
 
 #[derive(Debug, Parser)]

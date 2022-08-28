@@ -1,5 +1,5 @@
 use super::toml_struct::*;
-use clap::{Parser, Subcommand};
+// use clap::{Parser, Subcommand};
 use std::collections::HashSet;
 use std::{
     fs::File,
@@ -141,14 +141,14 @@ impl ProcessSub for Fix {
     }
 }
 
-impl ProcessSub for New{
+impl ProcessSub for New {
     fn process(self, file_path: &Path) -> Result<(), ManagerError> {
-        let file = File::open(file_path)?;
-        if file.len() != 0 {
-            return Ok(())
+        let file = File::create(file_path)?;
+        if file.metadata()?.len() != 0 {
+            return Ok(());
         }
 
-        let config = Config{ workspace: Workspace { members: vec![] } };
+        let config = Config { workspace: Workspace { members: vec![] } };
         let content = toml::to_string(&config)?;
         overwrite_toml(file_path, content)?;
 
