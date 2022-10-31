@@ -9,6 +9,9 @@ pub struct Cli {
 
     #[clap(short, long)]
     pub debug: bool,
+
+    #[clap(long)]
+    pub loc: Option<String>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -18,6 +21,7 @@ pub enum Action {
     Rename(Rename),
     Delete(Delete),
     New(New),
+    // Init(init), todo: new function
 }
 
 #[derive(Debug, Parser)]

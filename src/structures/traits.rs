@@ -1,5 +1,7 @@
 use super::toml_struct::*;
 // use clap::{Parser, Subcommand};
+use crate::command::{Add, Delete, Fix, New, Rename};
+use crate::ManagerError;
 use std::collections::HashSet;
 use std::{
     fs::File,
@@ -8,8 +10,7 @@ use std::{
     process::{Command, Output},
 };
 use toml;
-use crate::command::{Add, Delete, Fix, New, Rename};
-use crate::ManagerError;
+use tracing::{debug};
 
 pub trait ProcessSub {
     fn process(self, file_path: &Path) -> Result<(), ManagerError>;
@@ -21,13 +22,18 @@ impl ProcessSub for Add {
         // process toml file
         let raw_string = read_toml(file_path)?;
         let mut config = toml::from_str::<Config>(&raw_string)?;
+
         config.workspace.members.push(self.name.clone());
 
         let content = toml::to_string(&config)?;
         overwrite_toml(file_path, content)?;
 
         // process file system
-        let res = Command::new("cargo").arg("new").arg("--lib").arg(name).output()?;
+        let res = Command::new("cargo")
+            .arg("new")
+            .arg("--lib")
+            .arg(name)
+            .output()?;
         print_shell_res(res);
 
         Ok(())
@@ -143,12 +149,14 @@ impl ProcessSub for Fix {
 
 impl ProcessSub for New {
     fn process(self, file_path: &Path) -> Result<(), ManagerError> {
-        let file = File::create(file_path)?;
+        let file = File::options().write(true).create(true).truncate(false).open(file_path)?;
         if file.metadata()?.len() != 0 {
             return Ok(());
         }
 
-        let config = Config { workspace: Workspace { members: vec![] } };
+        let config = Config {
+            workspace: Workspace { members: vec![] },
+        };
         let content = toml::to_string(&config)?;
         overwrite_toml(file_path, content)?;
 
@@ -162,6 +170,7 @@ fn read_toml(file_path: &Path) -> Result<String, ManagerError> {
 
     let mut content = String::new();
     file.read_to_string(&mut content)?;
+
     Ok(content)
 }
 
@@ -169,6 +178,8 @@ fn overwrite_toml(file_path: &Path, content: String) -> Result<(), ManagerError>
     let mut file = File::options().write(true).truncate(true).open(file_path)?;
     file.write_all(&content.as_bytes()[..])?;
 
+
+    debug!("before write: {}", content);
     Ok(())
 }
 
