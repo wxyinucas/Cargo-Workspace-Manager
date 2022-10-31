@@ -1,21 +1,11 @@
 [package]
 name = "manager"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1"
-thiserror = "1"
-clap = { version = "3", features = ["derive"] }
-toml = "0.5.9"
-serde = "*"
-serde_derive = "*"
-tracing = { version = "0.1.36" }
-tracing-subscriber = { version = "0.3.15", features = ['env-filter'] }
-tracing-core = "*"
-ansi_term = "0.12"
 
 [dev-dependencies]
 tempfile = "3"
