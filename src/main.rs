@@ -1,8 +1,11 @@
 use std::fs::File;
 use std::io::Write;
 
-use anyhow::Result;
 use clap::{Parser, Subcommand};
+
+use errors::{ManagerError, Result};
+
+mod errors;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -105,6 +108,7 @@ fn exists_file(file_name: &str) -> Result<bool> {
 }
 
 fn create_file_if_not_exists(file_name: &str, content: &str) -> Result<()> {
+    // TODO: 应该用不同error来表达
     if exists_file(file_name).unwrap() {
         println!("INFO: File `{}` already exists", file_name);
         return Ok(());
@@ -133,10 +137,7 @@ mod tests {
     */
 
     use std::env;
-    use std::env::current_exe;
     use std::process::Command;
-    use std::thread::sleep;
-    use std::time::Duration;
 
     use tempfile::tempdir_in;
 
@@ -153,13 +154,17 @@ mod tests {
 
         // 生成临时文件夹，并切换进去
         let tmp_dir = tempdir_in(upper_dir).unwrap();
+        // let mut tmp_dir = upper_dir.clone(); // TODO 记录不用temp时的临时开发方式，可以包装到一个函数里
+        // tmp_dir.push("test_dir");
+        // println!("tmp dir: {:?}", tmp_dir);
+        // std::fs::create_dir(&tmp_dir).unwrap();
+
         env::set_current_dir(&tmp_dir).unwrap();
 
         // 粘贴文件
-        let old_file = current_exe().unwrap();
+        let old_file ="/Users/wxy/Library/Mobile Documents/com~apple~CloudDocs/rust_icloud/wxy_manager/target/debug/manager";
         let mut new_file = env::current_dir().unwrap();
         new_file.push("manager");
-        // println!("Debug old_file:{:?},\n new_file: {:?}", old_file, new_file);
         std::fs::copy(old_file, new_file).expect("Copy failed");
 
         init_should_work();
@@ -169,15 +174,13 @@ mod tests {
         // TODO 开发流程别太长，test似乎也是，在没有足够确定性的时候缩短测试流程。
         // 使用命令
 
-        println!("{:?}", std::env::current_dir());
-        let res = Command::new("./manager")
+        Command::new("./manager")
             .arg("init")
             .output()
             .expect("manager cant operate.");
-        println!("{:?}", res.status);
-        _debug_show_files();
 
-        sleep(Duration::from_secs(1));
         assert_eq!(exists_file("Cargo.toml").unwrap(), true);
+        assert_eq!(exists_file("README.md").unwrap(), true);
+        assert_eq!(exists_file(".gitignore").unwrap(), true);
     }
 }
