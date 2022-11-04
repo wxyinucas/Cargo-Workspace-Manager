@@ -65,11 +65,27 @@ impl TakeAction for Init {
         }
         println!("INFO: Trying to create `Cargo.toml` `README` & `gitignore`...");
 
-        create_file_if_not_exists("Cargo.toml", "[workspace]")?;
-        create_file_if_not_exists("README.md", "")?;
-        create_file_if_not_exists(".gitignore", "/target\n/Cargo.lock")?;
+        let cargo = create_file_if_not_exists("Cargo.toml", "[workspace]");
+        let readme = create_file_if_not_exists("README.md", "");
+        let git = create_file_if_not_exists(".gitignore", "/target\n/Cargo.lock");
 
-        println!("INFO: Done!");
+        let mut exists = String::new();
+        for res in [cargo, readme, git].into_iter() {
+            if res.is_err() {
+                match res.unwrap_err() {
+                    ManagerError::FileExistError(file_name) => {
+                        exists.push_str(&*format!("{}, ", file_name))
+                    }
+                    _ => continue,
+                }
+            }
+        }
+        if exists.is_empty() {
+            println!("INFO: Done!");
+        } else {
+            exists.truncate(exists.len() - 2);
+            println!("INFO: Done, files: {} exist.", exists);
+        }
         Ok(())
     }
 }
@@ -108,10 +124,8 @@ fn exists_file(file_name: &str) -> Result<bool> {
 }
 
 fn create_file_if_not_exists(file_name: &str, content: &str) -> Result<()> {
-    // TODO: 应该用不同error来表达
     if exists_file(file_name).unwrap() {
-        println!("INFO: File `{}` already exists", file_name);
-        return Ok(());
+        return Err(ManagerError::FileExistError(file_name.to_string()));
     }
 
     let mut file = File::create(file_name)?;
@@ -141,7 +155,7 @@ mod tests {
 
     use tempfile::tempdir_in;
 
-    use crate::{_debug_show_files, exists_file};
+    use crate::exists_file;
 
     // TODO 如何更高效的阅读crate
     #[test]
