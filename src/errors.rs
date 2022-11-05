@@ -9,4 +9,13 @@ pub enum ManagerError {
 
     #[error("File {0} already exists.")]
     FileExistError(String),
+
+    #[error("Toml de Error: {0}")]
+    TomlDeError(#[from] toml::de::Error),
+
+    #[error("Toml ser Error: {0}")]
+    TomlGeError(#[from] toml::ser::Error),
+
+    #[error("String Error: {0}")]
+    Utf8Error(#[from] std::string::FromUtf8Error),
 }

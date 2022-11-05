@@ -3,7 +3,7 @@
 
 ## 支持的命令
 - `init`: 生成带`[workspace]`的`Cargo.toml`，生成`.gitignore`，生成`README.md`.
-- `add`: 执行带`--vcs=no`的`cargo new`命令，同时在中`[workspace]`中注册。
+- `add`: 执行带`--vcs=none`的`cargo new`命令，同时在中`[workspace]`中注册。
 - `remove`: 在文件系统和`[workspace]`中删除项目。
 
 ## 开发目标：
